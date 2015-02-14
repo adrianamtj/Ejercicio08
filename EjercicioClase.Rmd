@@ -1,0 +1,112 @@
+Title
+========================================================
+
+
+
+```{r Ajustes, echo=FALSE}
+directorio <- "/Users/Ines/Desktop"
+```
+
+##Descripcion de los datos
+La informacion se obtuvo de la pagina del Banco de Mexico el dia 28 de agosto del 2014.
+
+```{r LecturaDatos}
+setwd(directorio)
+TC.Banxico <- read.table("./tipoCambioBanxico.txt", 
+           sep ="|",
+           header =TRUE,
+           stringsAsFactors = FALSE)
+```
+
+##Transformacion de los datos
+```{r Transformacion}
+TC.Banxico$Fecha.DOF <-as.Date(TC.Banxico$Fecha.DOF, format = "%d/%m/%Y")
+temporal <- as.POSIXlt(TC.Banxico$Fecha.DOF)
+
+# Creo una columna con el a?o.
+TC.Banxico$anio <- unclass(temporal)$year+1900
+```
+```
+
+```{r Filtro}
+TC.Banxico.existentes <- subset(TC.Banxico, TC != "N/E")
+TC.Banxico.existentes$TC <- as.numeric(TC.Banxico.existentes$TC)
+str(TC.Banxico.existentes)
+```
+
+##Pregunta 1 y 2
+```{r}
+par(mfrow=c(3,3))
+for(i in 2006:2014){
+   anios = subset(TC.Banxico.existentes, anio == i)
+   hist(anios$TC,
+       main = i,
+       border = "white",
+       col = "blue",
+       xlab = "Tipo de Cambio",
+       ylab = "Frecuencia",
+       breaks = seq(9.9, 15.4, length.out = 30),
+       xlim = c(9.9, 15.4),
+       ylim = c(0, 120),
+      )
+   media <- mean(anios$TC)
+   mediana <- median(anios$TC)
+   abline(v = media, col = "red", lwd = 3)
+   abline(v = mediana, col = "black", lwd = 3)
+   }
+```
+
+##Pregunta 3
+En 2006, el tipo de cambio se mantuvo alrededor de los 10 y 12 pesos, con una frecuencia mayor alrededor de 11.
+En 2007, el tipo de cambio estuvo alrededor de los 11 pesos, y no hubo mucho cambio, por lo tanto las frecuencias son altas.
+En 2008, el tipo de cambio fue muy volatil y fue desde los 10, hasta los 14 pesos, con mayor frecuencia entre los 10 y 11.
+En 2009, el tipo de cambio estuvo entre los 13 y 15 pesos, con mayor frecuencia alrededor de los 13.
+En 2010, el tipo de cambio estuvo entre los 12 y 13 pesos, con casi la misma frecuencia en sus diferentes variaciones.
+En 2011, estuvo entre los 11 y 14 pesos, con una frecuencia mayor alrededor de los 12 pesos.
+En 2012, estuvo entre los 12 y 14 pesos, con mayor frecuencia alrededor de los 13 pesos.
+En 2013, estuvo entre los 12 y 14 pesos, con mayor frecuencia alrededor de los 13 pesos, pero, en porcentaje, menor que en el 2013, aunque las frecuencias m??ximas hayan sido parecidas.
+En 2014, se mantuvo alrededor de los 13 pesos, y hubo pocas variaciones.
+En general, el tipo de cambio fue subiendo, ya que empez?? entre los 10 y 12 pesos, de 2006 a 2008, en 2009 subi?? para colocarse entre los 12 y 15 pesos y as?? se mantuvo hasta 2014. El precio m??s bajo fue de alrededor de 11 pesos, y el m??s alto alrededor de los 13, tomando las frecuencias m??s aktas para cada a??o.
+
+##Pregunta 4
+```{r}
+par(mfrow = c(1,1), las = 1)
+with(TC.Banxico.existentes,
+     boxplot(TC~factor(anio),
+             range = 0,
+             varwidth = TRUE))
+
+```
+
+##Pregunta 5
+En  2006 hay poca volatilidad, estano entre los 10 y 12, y la frecuencia se mantiene alrededor de 11.
+En 2007, hay menos volatilidad que en 2007, y la frecuencia se matiene alrededor de 11 tambi??n.
+Para 2008, la volatilidad si es mayor, va desde 10 hasta 14, con mayor frecuencia entre 10 y 11.
+Para 2009, cambia mucho el rango, ya que ahora va de 13 a 15 pesos, con mayor frecuencia entre 13 y 14.
+En 2010, la volatilidad es baja, va de 12 a 13.5, con mayor frecuencia por debajo de 13.
+En 2011, la volatilidad es mucha, y las frecuencias bastante dispersas entre 12 y 13, y la frecuencua m??s alta en 12.
+En 2012, hay volatilidad media, pero si se distingue cierto comportamiento homog??neo alrededor de los 13 pesos.
+en 2013, hay volatilidad media, pero igual se distingue cierto comportamiento homog??neo por debajo de los 13 pesos.
+Y, en 2014, hay muy poca volatilidad, ya que se mantiene alrededor de los 13 pesos, y la frecuencia mayor en 13.
+Comparando con los resultados obtenidos en la pregunta 3, se llega a las mismas conclusiones, pero en la gr??fica boxplot es m??s f??cil apreciarlo.
+
+##Pregunta 6
+```{r}
+densidad <- function(x) {
+  (1/(sqrt(2 * pi))) * exp(-(x^2)/2)
+}
+expresion <- expression(paste("Grafica de la funcion ", frac(1, sqrt(2 * pi)) %.% e^{-frac(x^2,2)}))
+curve(densidad,
+      from = -4, to = 4,
+      xlab = "x",
+      ylab = "f(x)",
+      col = "red",
+      main = expresion
+      )
+solucion <- data.frame(x = 0, y = 0.4, etiqueta = "Valor maximo")
+points(solucion, col = "blue", pch = 19, bg ="16")
+text(solucion$x, solucion$y, solucion$etiqueta, pos = 4)
+par(las = 1)
+abline(v = 0)
+
+```
